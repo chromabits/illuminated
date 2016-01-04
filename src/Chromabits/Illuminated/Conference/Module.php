@@ -56,11 +56,6 @@ abstract class Module extends BaseObject
     /**
      * @return string
      */
-    abstract public function getName();
-
-    /**
-     * @return string
-     */
     abstract public function getLabel();
 
     /**
@@ -134,10 +129,43 @@ abstract class Module extends BaseObject
                         'class' => 'nav-link',
                     ], Std::coalesce($method->getLabel(), $methodName)),
                 ]);
-            }, Std::filter(function (Method $method) {
-                return !$method->isHidden();
-            }, $this->getMethods()))
+            },
+                Std::filter(function (Method $method) {
+                    return !$method->isHidden();
+                },
+                    $this->getMethods()))
         ))->render());
+    }
+
+    /**
+     * @return string
+     */
+    abstract public function getName();
+
+    /**
+     * Register a method on this module.
+     *
+     * @param string $name
+     * @param string $controllerClassName
+     * @param string $controllerMethodName
+     * @param string $verb
+     *
+     * @return Module
+     */
+    protected function registerHidden(
+        $name,
+        $controllerClassName,
+        $controllerMethodName,
+        $verb = 'GET'
+    ) {
+        return $this->register(
+            $name,
+            $controllerClassName,
+            $controllerMethodName,
+            null,
+            $verb,
+            true
+        );
     }
 
     /**
@@ -149,6 +177,8 @@ abstract class Module extends BaseObject
      * @param null|string $label
      * @param string $verb
      * @param bool $hidden
+     *
+     * @return $this
      */
     protected function register(
         $name,
@@ -174,5 +204,7 @@ abstract class Module extends BaseObject
         }
 
         $this->methods[$name] = $method;
+
+        return $this;
     }
 }

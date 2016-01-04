@@ -62,7 +62,9 @@ class ConferenceRouteDirectory extends BaseObject implements RouteMapper
             ->get('/', 'anyIndex')
             ->get('/css/main.css', 'getCss')
             ->get('/{moduleName}', 'anyModule')
+            ->post('/{moduleName}', 'anyModule')
             ->get('/{moduleName}/{methodName}', 'anyMethod')
+            ->post('/{moduleName}/{methodName}', 'anyMethod')
             ->inject($router);
     }
 }

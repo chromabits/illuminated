@@ -15,7 +15,9 @@ use Chromabits\Illuminated\Alerts\Alert;
 use Chromabits\Illuminated\Contracts\Alerts\AlertManager;
 use Chromabits\Nucleus\Foundation\BaseObject;
 use Chromabits\Nucleus\Support\Std;
+use Chromabits\Nucleus\View\Common\Bold;
 use Chromabits\Nucleus\View\Common\Div;
+use Chromabits\Nucleus\View\Common\Paragraph;
 use Chromabits\Nucleus\View\Interfaces\RenderableInterface;
 
 /**
@@ -69,7 +71,37 @@ class AlertPresenter extends BaseObject implements RenderableInterface
                     break;
             }
 
-            return new Div(['class' => $classes], $alert->getContent());
+            return new Div(
+                ['class' => $classes],
+                $this->simplifyContent($alert->getContent())
+            );
         }, $this->alerts));
+    }
+
+    /**
+     * Simplify the alert content into something Node can render.
+     *
+     * @param string|array $content
+     *
+     * @return array
+     */
+    protected function simplifyContent($content)
+    {
+        if (is_string($content)) {
+            return $content;
+        } elseif (is_array($content)) {
+            return Std::map(function ($value, $key) {
+                if (is_numeric($key)) {
+                    return $value;
+                }
+
+                return new Paragraph([], [
+                    new Bold([], vsprintf('%s: ', [$key])),
+                    $value
+                ]);
+            }, $content);
+        }
+
+        return $content;
     }
 }

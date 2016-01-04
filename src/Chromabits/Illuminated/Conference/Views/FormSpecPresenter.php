@@ -10,6 +10,7 @@ use Chromabits\Nucleus\Foundation\BaseObject;
 use Chromabits\Nucleus\Meditation\Constraints\AbstractConstraint;
 use Chromabits\Nucleus\Meditation\Constraints\InArrayConstraint;
 use Chromabits\Nucleus\Meditation\Constraints\PrimitiveTypeConstraint;
+use Chromabits\Nucleus\Meditation\Exceptions\InvalidArgumentException;
 use Chromabits\Nucleus\Meditation\FormSpec;
 use Chromabits\Nucleus\Meditation\Primitives\ScalarTypes;
 use Chromabits\Nucleus\Support\Html;
@@ -63,6 +64,14 @@ class FormSpecPresenter extends BaseObject implements
         $this->attributes = $attributes;
     }
 
+    /**
+     * Render a single field into an input field.
+     *
+     * @param string $fieldName
+     *
+     * @return Input
+     * @throws InvalidArgumentException
+     */
     public function renderField($fieldName)
     {
         // First, attempt to render a select field if the spec mentions an
@@ -74,7 +83,11 @@ class FormSpecPresenter extends BaseObject implements
             })
             ->bind(function (InArrayConstraint $constraint) use ($fieldName) {
                 return Maybe::just(new Select(
-                    ['id' => $fieldName, 'class' => 'c-select'],
+                    [
+                        'id' => $fieldName,
+                        'class' => 'c-select',
+                        'name' => $fieldName,
+                    ],
                     ArrayList::of($constraint->getAllowed())
                         ->map(function ($item) {
                             return new Option(
@@ -97,6 +110,7 @@ class FormSpecPresenter extends BaseObject implements
             $attributes = ArrayMap::of([
                 'id' => $fieldName,
                 'class' => 'form-control',
+                'name' => $fieldName,
             ]);
 
             switch($type->toString()) {
@@ -142,10 +156,19 @@ class FormSpecPresenter extends BaseObject implements
         return new Input([
             'id' => $fieldName,
             'class' => 'form-control',
+            'name' => $fieldName,
             'type' => 'text',
         ]);
     }
 
+    /**
+     * Render field and description.
+     *
+     * @param string $fieldName
+     *
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
     protected function renderFullField($fieldName)
     {
         $fieldNodes = $this->renderField($fieldName);

@@ -111,12 +111,13 @@ class ConferenceController extends BaseController
         if ($result->hasSidebar()) {
             return (new ConferencePage(
                 $this->context,
+                $this->dashboard,
                 $panel,
                 $result->getSidebar()
             ))->render();
         }
 
-        return (new ConferencePage($this->context, $panel))->render();
+        return (new ConferencePage($this->context, $this->dashboard, $panel))->render();
     }
 
     /**
@@ -161,10 +162,21 @@ class ConferenceController extends BaseController
     public function getCss()
     {
         return Response::create(
-            implode("\n", [
-                '.btn-y-align { padding-top: 3px; }',
-                '.text-light { color: #ddd; }',
-            ]),
+            <<<'EOD'
+.btn-y-align { padding-top: 3px; }
+.text-light { color: #ddd; }
+
+body {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+hr {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+EOD
+            ,
             Response::HTTP_OK,
             ['Content-Type' => 'text/css']
         );

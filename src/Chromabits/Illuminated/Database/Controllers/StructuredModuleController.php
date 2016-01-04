@@ -12,6 +12,7 @@
 namespace Chromabits\Illuminated\Database\Controllers;
 
 use Chromabits\Illuminated\Database\Interfaces\StructuredStatusInterface;
+use Chromabits\Illuminated\Database\Views\ConferenceStructuredStatisticsPresenter;
 use Chromabits\Illuminated\Http\BaseController;
 use Chromabits\Nucleus\Support\Std;
 use Chromabits\Nucleus\View\Bootstrap\Card;
@@ -41,6 +42,7 @@ class StructuredModuleController extends BaseController
 
         return new Div(
             [], [
+                new ConferenceStructuredStatisticsPresenter($report),
                 new Card(
                     [], [
                         new CardHeader([], 'Pending Migrations'),

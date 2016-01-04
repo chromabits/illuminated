@@ -84,7 +84,7 @@ abstract class ServiceProviderTestCase extends TestCase
      *
      * @return ServiceProvider
      */
-    abstract public function make(Application $app);
+    abstract protected function make(Application $app);
 
     public function testRegister()
     {

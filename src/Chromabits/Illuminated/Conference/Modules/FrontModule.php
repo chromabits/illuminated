@@ -11,8 +11,8 @@
 
 namespace Chromabits\Illuminated\Conference\Modules;
 
+use Chromabits\Illuminated\Conference\Controllers\FrontModuleController;
 use Chromabits\Illuminated\Conference\Module;
-use Chromabits\Illuminated\Conference\ModuleControllers\FrontModuleController;
 
 /**
  * Class FrontModule.
@@ -81,5 +81,13 @@ class FrontModule extends Module
     public function getDescription()
     {
         return 'Provides an overview panel for Conference.';
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return 'fa-home';
     }
 }

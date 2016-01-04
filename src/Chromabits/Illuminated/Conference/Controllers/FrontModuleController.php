@@ -9,7 +9,7 @@
  * This file is part of the Illuminated package
  */
 
-namespace Chromabits\Illuminated\Conference\ModuleControllers;
+namespace Chromabits\Illuminated\Conference\Controllers;
 
 use Chromabits\Illuminated\Conference\Entities\ConferenceContext;
 use Chromabits\Illuminated\Conference\Interfaces\DashboardInterface;
@@ -29,6 +29,7 @@ use Chromabits\Nucleus\View\Common\HeaderFive;
 use Chromabits\Nucleus\View\Common\HeaderFour;
 use Chromabits\Nucleus\View\Common\HeaderSix;
 use Chromabits\Nucleus\View\Common\HorizontalLine;
+use Chromabits\Nucleus\View\Common\Italic;
 use Chromabits\Nucleus\View\Common\LineBreak;
 use Chromabits\Nucleus\View\Common\ListItem;
 use Chromabits\Nucleus\View\Common\Paragraph;
@@ -41,7 +42,7 @@ use Exception;
  * Class FrontModuleController.
  *
  * @author Eduardo Trujillo <ed@chromabits.com>
- * @package Chromabits\Illuminated\Conference\ModuleControllers
+ * @package Chromabits\Illuminated\Conference\Controllers
  */
 class FrontModuleController extends BaseController
 {
@@ -106,7 +107,13 @@ class FrontModuleController extends BaseController
                                 [
                                     new HeaderFour(
                                         ['class' => 'card-title'],
-                                        $module->getLabel()
+                                        [
+                                            $module->getLabel(),
+                                            new Italic([
+                                                'class' => 'pull-right fa ' .
+                                                    $module->getIcon()
+                                            ]),
+                                        ]
                                     ),
                                 ]
                             ),
@@ -203,7 +210,7 @@ class FrontModuleController extends BaseController
                                 . $exception->getLine(),
                             ]),
                             new Column(
-                                ['medium' => 6, 'class' => 'text-right'],
+                                ['medium' => 6, 'class' => 'text-xs-right'],
                                 new Button(
                                     [
                                         'href' => '#',

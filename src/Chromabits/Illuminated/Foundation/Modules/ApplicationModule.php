@@ -9,22 +9,22 @@
  * This file is part of the Illuminated package
  */
 
-namespace Chromabits\Illuminated\Database\Modules;
+namespace Chromabits\Illuminated\Foundation\Modules;
 
 use Chromabits\Illuminated\Conference\Module;
-use Chromabits\Illuminated\Database\Controllers\StructuredModuleController;
-use Chromabits\Illuminated\Database\Interfaces\StructuredStatusInterface;
-use Chromabits\Illuminated\Database\Migrations\Batch;
+use Chromabits\Illuminated\Foundation\Controllers\ApplicationController;
+use Chromabits\Illuminated\Foundation\Interfaces\ApplicationManifestInterface;
 use Chromabits\Nucleus\Exceptions\CoreException;
+use Chromabits\Nucleus\Http\Enums\HttpMethods;
 use Illuminate\Contracts\Container\Container;
 
 /**
- * Class StructuredModule.
+ * Class ApplicationModule.
  *
  * @author Eduardo Trujillo <ed@chromabits.com>
- * @package Chromabits\Illuminated\Database\Modules
+ * @package Chromabits\Illuminated\Foundation\Modules
  */
-class StructuredModule extends Module
+class ApplicationModule extends Module
 {
     /**
      * @var Container
@@ -32,7 +32,7 @@ class StructuredModule extends Module
     protected $container;
 
     /**
-     * Construct an instance of a StructuredModule.
+     * Construct an instance of a ApplicationModule.
      *
      * @param Container $container
      */
@@ -40,21 +40,30 @@ class StructuredModule extends Module
     {
         parent::__construct();
 
+        $this->container = $container;
+
         $this->register(
             'index',
-            StructuredModuleController::class,
+            ApplicationController::class,
             'getIndex',
-            'Database Problems'
+            'Summary'
         );
 
         $this->register(
-            'all',
-            StructuredModuleController::class,
-            'getAll',
-            'All Migrations'
+            'prose',
+            ApplicationController::class,
+            'getProse',
+            'Documentation'
         );
 
-        $this->container = $container;
+        $this->register(
+            'single',
+            ApplicationController::class,
+            'getSingle',
+            'Sngle Item',
+            HttpMethods::GET,
+            true
+        );
     }
 
     /**
@@ -66,19 +75,10 @@ class StructuredModule extends Module
     {
         parent::boot();
 
-        if (!$this->container->bound(StructuredStatusInterface::class)) {
+        if (!$this->container->bound(ApplicationManifestInterface::class)) {
             throw new CoreException(
-                'This module requires the Structured service to be loaded. ' .
-                'Please make sure that `StructuredMigrationsServiceProvider` ' .
-                'is in your application\'s `config/app.php` file.'
-            );
-        }
-
-        if (!$this->container->bound(Batch::class)) {
-            throw new CoreException(
-                'While the Structured service is loaded, there isn\'t a ' .
-                'Batch defined at the moment. Please define a Batch class ' .
-                'for your application and bind it using a service provider.'
+                'An instance of ApplicationManifest must be bound to in the ' .
+                'container in order to provide application reflection data.'
             );
         }
     }
@@ -88,7 +88,7 @@ class StructuredModule extends Module
      */
     public function getName()
     {
-        return 'illuminated.database.structured';
+        return 'illuminated.conference.application';
     }
 
     /**
@@ -96,7 +96,7 @@ class StructuredModule extends Module
      */
     public function getLabel()
     {
-        return 'Structured';
+        return 'Application';
     }
 
     /**
@@ -104,7 +104,7 @@ class StructuredModule extends Module
      */
     public function getDescription()
     {
-        return 'View database migrations status.';
+        return 'Documentation based on reflection';
     }
 
     /**
@@ -122,6 +122,6 @@ class StructuredModule extends Module
      */
     public function getIcon()
     {
-        return 'fa-database';
+        return 'fa-sitemap';
     }
 }

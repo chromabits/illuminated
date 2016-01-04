@@ -51,6 +51,16 @@ class ResourceFactory extends BaseObject
     protected $prefix;
 
     /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var string
+     */
+    protected $description;
+
+    /**
      * Construct an instance of a ResourceFactory.
      *
      * @param string $controller
@@ -62,12 +72,14 @@ class ResourceFactory extends BaseObject
     {
         parent::__construct();
 
-        Arguments::contain(Boa::string())->check($controller);
+        Arguments::define(Boa::string())->check($controller);
 
         $this->controller = $controller;
         $this->middleware = [];
         $this->methods = [];
         $this->prefix = null;
+        $this->name = 'Unknown';
+        $this->description = 'This resource does not provide a description.';
     }
 
     /**
@@ -90,7 +102,7 @@ class ResourceFactory extends BaseObject
      */
     public function withMiddleware(array $middleware)
     {
-        Arguments::contain(Boa::arrOf(Boa::string()))->check($middleware);
+        Arguments::define(Boa::arrOf(Boa::string()))->check($middleware);
 
         $this->middleware += $middleware;
 
@@ -161,6 +173,7 @@ class ResourceFactory extends BaseObject
      * Inject routes into the provided router.
      *
      * @param Router $router
+     * @return Router
      */
     public function inject(Router $router)
     {
@@ -181,6 +194,8 @@ class ResourceFactory extends BaseObject
                 );
             }, $this->methods);
         });
+
+        return $router;
     }
 
     /**
@@ -190,9 +205,81 @@ class ResourceFactory extends BaseObject
      */
     public function withPrefix($prefix)
     {
-        Arguments::contain(Boa::string())->check($prefix);
+        Arguments::define(Boa::string())->check($prefix);
 
         $this->prefix = $prefix;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMiddleware()
+    {
+        return $this->middleware;
+    }
+
+    /**
+     * @return ResourceMethod[]
+     */
+    public function getMethods()
+    {
+        return $this->methods;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return ResourceFactory
+     */
+    public function name($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param string $description
+     *
+     * @return ResourceFactory
+     */
+    public function description($description)
+    {
+        $this->description = $description;
 
         return $this;
     }

@@ -36,6 +36,11 @@ abstract class Module extends BaseObject
     protected $methods;
 
     /**
+     * @var string
+     */
+    protected $icon;
+
+    /**
      * Construct an instance of a Module.
      */
     public function __construct()
@@ -43,6 +48,15 @@ abstract class Module extends BaseObject
         parent::__construct();
 
         $this->methods = [];
+        $this->icon = 'fa-question-circle';
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
     }
 
     /**

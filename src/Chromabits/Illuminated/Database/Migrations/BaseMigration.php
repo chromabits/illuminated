@@ -58,15 +58,11 @@ abstract class BaseMigration extends Migration
 
     /**
      * Run migrations up.
-     *
-     * @return mixed
      */
     abstract public function up();
 
     /**
      * Rollback changes performed by this migration.
-     *
-     * @return mixed
      */
     abstract public function down();
 }

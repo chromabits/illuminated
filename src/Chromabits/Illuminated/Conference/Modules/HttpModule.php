@@ -11,8 +11,8 @@
 
 namespace Chromabits\Illuminated\Conference\Modules;
 
+use Chromabits\Illuminated\Conference\Controllers\HttpModuleController;
 use Chromabits\Illuminated\Conference\Module;
-use Chromabits\Illuminated\Conference\ModuleControllers\HttpModuleController;
 
 /**
  * Class HttpModule.
@@ -83,5 +83,13 @@ class HttpModule extends Module
     public function getDefaultMethodName()
     {
         return 'index';
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return 'fa-map-o';
     }
 }

@@ -56,7 +56,7 @@ class ConferencePaginator extends BaseObject implements
             function () {
                 return new CardBlock(
                     ['class' => 'card-block text-center'],
-                    [Html::safe($this->paginator->render())]
+                    new BootstrapFourPaginatorPresenter($this->paginator)
                 );
             },
             ''

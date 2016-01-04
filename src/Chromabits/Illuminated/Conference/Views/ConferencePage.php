@@ -12,11 +12,16 @@
 namespace Chromabits\Illuminated\Conference\Views;
 
 use Chromabits\Illuminated\Conference\Entities\ConferenceContext;
+use Chromabits\Illuminated\Conference\Interfaces\DashboardInterface;
+use Chromabits\Illuminated\Conference\Module;
 use Chromabits\Nucleus\Support\Html;
+use Chromabits\Nucleus\Support\Std;
 use Chromabits\Nucleus\View\Bootstrap\Column;
 use Chromabits\Nucleus\View\Bootstrap\Container;
+use Chromabits\Nucleus\View\Bootstrap\DropdownFactory;
 use Chromabits\Nucleus\View\Bootstrap\Row;
 use Chromabits\Nucleus\View\Common\Anchor;
+use Chromabits\Nucleus\View\Common\Italic;
 use Chromabits\Nucleus\View\Common\ListItem;
 use Chromabits\Nucleus\View\Common\Navigation;
 use Chromabits\Nucleus\View\Common\Paragraph;
@@ -54,20 +59,28 @@ class ConferencePage implements RenderableInterface, SafeHtmlProducerInterface
     protected $context;
 
     /**
+     * @var DashboardInterface
+     */
+    protected $dashboard;
+
+    /**
      * Construct an instance of a ConferencePage.
      *
      * @param ConferenceContext $context
+     * @param DashboardInterface $dashboard
      * @param string $panel
      * @param null $sidebar
      */
     public function __construct(
         ConferenceContext $context,
+        DashboardInterface $dashboard,
         $panel = 'Empty.',
         $sidebar = null
     ) {
         $this->sidebar = $sidebar;
         $this->panel = $panel;
         $this->context = $context;
+        $this->dashboard = $dashboard;
     }
 
     /**
@@ -87,11 +100,29 @@ class ConferencePage implements RenderableInterface, SafeHtmlProducerInterface
      */
     public function render()
     {
+        $title = 'Illuminated';
+
         $dashboardUrl = $this->context->url();
         $modulesUrl = $this->context->method(
             'illuminated.conference.front',
             'modules'
         );
+
+        $modulesDropdown = Std::foldr(
+            function (NavbarDropdownFactory $factory, Module $module) {
+                return $factory->addOption(
+                    $this->context->module($module->getName()),
+                    $module->getLabel()
+                );
+            },
+            new NavbarDropdownFactory(),
+            $this->dashboard->getModules()
+        )
+            ->setContent([
+                new Italic(['class' => 'fa fa-rocket']),
+                ' Launchpad'
+            ])
+            ->make();
 
         $innerPage = new Page(
             [
@@ -119,6 +150,7 @@ class ConferencePage implements RenderableInterface, SafeHtmlProducerInterface
                                                 'Home'
                                             )
                                         ),
+                                        $modulesDropdown,
                                         new ListItem(
                                             ['class' => 'nav-item'],
                                             new Anchor(
@@ -126,7 +158,13 @@ class ConferencePage implements RenderableInterface, SafeHtmlProducerInterface
                                                     'href' => $modulesUrl,
                                                     'class' => 'nav-link',
                                                 ],
-                                                'Modules'
+                                                [
+                                                    new Italic([
+                                                        'class'
+                                                            => 'fa fa-asterisk',
+                                                    ]),
+                                                    ' Meta'
+                                                ]
                                             )
                                         ),
                                     ]
@@ -177,15 +215,15 @@ class ConferencePage implements RenderableInterface, SafeHtmlProducerInterface
                 new Link(
                     [
                         'rel' => 'stylesheet',
-                        'href' => 'https://cdn.rawgit.com/twbs/bootstrap/v4-dev'
-                            . '/dist/css/bootstrap.css',
+                        'href' => 'https://maxcdn.bootstrapcdn.com/bootstrap' .
+                            '/4.0.0-alpha.2/css/bootstrap.min.css',
                     ]
                 ),
                 new Link(
                     [
                         'rel' => 'stylesheet',
                         'href' => 'https://maxcdn.bootstrapcdn.com/font-awesome'
-                            . '/4.4.0/css/font-awesome.min.css',
+                            . '/4.5.0/css/font-awesome.min.css',
                     ]
                 ),
                 new Link(
@@ -226,7 +264,7 @@ class ConferencePage implements RenderableInterface, SafeHtmlProducerInterface
         return new Container(
             [], [
                 new Row(
-                    [], [
+                    ['class' => 'p-y-1'], [
                         new Column(
                             ['medium' => 3],
                             $this->sidebar

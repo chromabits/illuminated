@@ -13,6 +13,7 @@ namespace Chromabits\Illuminated\Http;
 
 use Chromabits\Illuminated\Http\Interfaces\RouteMapper;
 use Chromabits\Nucleus\Foundation\BaseObject;
+use Chromabits\Nucleus\Support\Std;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 
@@ -61,6 +62,14 @@ class RouteAggregator extends BaseObject implements RouteMapper
     }
 
     /**
+     * @return RouteMapper[]
+     */
+    public function getMappers()
+    {
+        return $this->mappers;
+    }
+
+    /**
      * Map routes.
      *
      * @param Router $router
@@ -69,10 +78,37 @@ class RouteAggregator extends BaseObject implements RouteMapper
      */
     public function map(Router $router)
     {
-        array_map(function ($mapperName) use ($router) {
+        Std::reduce(function (Router $router, $mapperName) {
+            if ($mapperName instanceof RouteMapper) {
+                $mapperName->map($router);
+
+                return $router;
+            }
+
             /** @var RouteMapper $mapper */
             $mapper = $this->app->make($mapperName);
             $mapper->map($router);
-        }, $this->mappers);
+
+            return $router;
+        }, $router, $this->getMappers());
+    }
+
+    /**
+     * Get instances of the defined mappers.
+     *
+     * @return RouteMapper[]
+     */
+    public function getMapperInstances()
+    {
+        return Std::reduce(function (array $mappers, $mapperName) {
+            if ($mapperName instanceof RouteMapper) {
+                return array_merge($mappers, [$mapperName]);
+            }
+
+            /** @var RouteMapper $mapper */
+            $mapper = $this->app->make($mapperName);
+
+            return array_merge($mappers, [$mapper]);
+        }, [], $this->getMappers());
     }
 }

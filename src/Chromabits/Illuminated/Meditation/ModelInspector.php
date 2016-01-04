@@ -1,10 +1,19 @@
 <?php
 
+/**
+ * Copyright 2015, Eduardo Trujillo <ed@chromabits.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * This file is part of the Illuminated package
+ */
+
 namespace Chromabits\Illuminated\Meditation;
 
+use Chromabits\Illuminated\Database\Articulate\Model;
 use Chromabits\Nucleus\Exceptions\LackOfCoffeeException;
 use Chromabits\Nucleus\Foundation\BaseObject;
-use Chromabits\Illuminated\Database\Articulate\Model;
 use Chromabits\Nucleus\Meditation\TypeHound;
 use Chromabits\Nucleus\Support\Arr;
 use Chromabits\Nucleus\Support\Std;
@@ -12,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use ReflectionMethod;
 
 /**
- * Class ModelInspector
+ * Class ModelInspector.
  *
  * The inspector class can perform a few kinds of introspection over
  * Illuminated models.
@@ -111,8 +120,8 @@ class ModelInspector extends BaseObject
      *
      * @param string $name
      *
-     * @return Relation
      * @throws LackOfCoffeeException
+     * @return Relation
      */
     public function getRelation($name)
     {

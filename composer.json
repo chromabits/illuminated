@@ -10,7 +10,9 @@
     "illuminate/view": "^5.0",
     "illuminate/database": "^5.0",
     "tijsverkoyen/css-to-inline-styles": "~1.5",
-    "chromabits/nucleus": "~0.4.4"
+    "chromabits/nucleus": "~0.4.7",
+    "league/commonmark": "^0.12",
+    "vlucas/phpdotenv": "~1.0"
   },
   "authors": [
     {
@@ -36,10 +38,5 @@
     "mockery/mockery": "0.9.*@dev",
     "doctrine/dbal": "~2.3",
     "chromabits/standards": "~0.1.10"
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "0.5-dev"
-    }
   }
 }

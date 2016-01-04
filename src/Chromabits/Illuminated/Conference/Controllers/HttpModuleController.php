@@ -9,7 +9,7 @@
  * This file is part of the Illuminated package
  */
 
-namespace Chromabits\Illuminated\Conference\ModuleControllers;
+namespace Chromabits\Illuminated\Conference\Controllers;
 
 use Chromabits\Illuminated\Http\BaseController;
 use Chromabits\Nucleus\Support\Std;
@@ -28,7 +28,7 @@ use Illuminate\Routing\Router;
  * Class HttpModuleController.
  *
  * @author Eduardo Trujillo <ed@chromabits.com>
- * @package Chromabits\Illuminated\Conference\ModuleControllers
+ * @package Chromabits\Illuminated\Conference\Controllers
  */
 class HttpModuleController extends BaseController
 {

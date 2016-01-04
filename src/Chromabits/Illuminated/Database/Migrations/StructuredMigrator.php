@@ -172,7 +172,16 @@ class StructuredMigrator implements StructuredMigratorInterface
      */
     public function rollback($pretend = false)
     {
+        if (!$this->repository->repositoryExists()) {
+            $this->note('<info>Nothing to rollback.</info>');
+
+            return 0;
+        }
+
         $this->notes = [];
+
+        $this->batch->validate();
+        $defined = array_reverse($this->batch->getExpanded());
 
         // We want to pull in the last batch of migrations that ran on the
         // previous migration operation. We'll then reverse those migrations and
@@ -180,7 +189,7 @@ class StructuredMigrator implements StructuredMigratorInterface
         // which ran.
         $migrations = $this->repository->getLast();
 
-        if (count($migrations) == 0) {
+        if (count($migrations) === 0) {
             $this->note('<info>Nothing to rollback.</info>');
 
             return count($migrations);
@@ -190,8 +199,19 @@ class StructuredMigrator implements StructuredMigratorInterface
         // reverse to what they run on "up". It lets us backtrack through the
         // migrations and properly reverse the entire database schema operation
         // that ran.
+        //
+        // For structured migrations, we have to do some additional magic to
+        // figure out the right order in which migrations should be rolled-back
+        // since a simple sort by name won't do.
+        $processedMigrations = [];
         foreach ($migrations as $migration) {
-            $this->runDown((object) $migration, $pretend);
+            $processedMigrations[$migration->migration] = $migration;
+        }
+
+        foreach ($defined as $name) {
+            if (array_key_exists($name, $processedMigrations)) {
+                $this->runDown((object) $processedMigrations[$name], $pretend);
+            }
         }
 
         return count($migrations);

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Copyright 2015, Eduardo Trujillo <ed@chromabits.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * This file is part of the Illuminated package
+ */
+
 namespace Chromabits\Illuminated\Genesis;
 
 use Chromabits\Illuminated\Database\Articulate\Model;
@@ -21,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * Class ModelGenerator
+ * Class ModelGenerator.
  *
  * The model generator attempts to populate models and their relationships.
  *
@@ -134,8 +143,8 @@ abstract class ModelGenerator extends BaseObject
      * @param ModelGenerator $generator
      * @param int $count
      *
-     * @return $this
      * @throws LackOfCoffeeException
+     * @return $this
      */
     public function with($relationName, ModelGenerator $generator, $count = 1)
     {
@@ -171,9 +180,9 @@ abstract class ModelGenerator extends BaseObject
      * @param string $relationName
      * @param Model|Model[] $related
      *
-     * @return $this
      * @throws LackOfCoffeeException
      * @throws InvalidArgumentException
+     * @return $this
      */
     public function withFixed($relationName, $related)
     {
@@ -226,8 +235,8 @@ abstract class ModelGenerator extends BaseObject
      *
      * @param bool $flush Remove old instance
      *
-     * @return Model
      * @throws LackOfCoffeeException
+     * @return Model
      */
     protected function getModelInstance($flush = false)
     {
@@ -263,8 +272,8 @@ abstract class ModelGenerator extends BaseObject
     /**
      * Generate the model.
      *
-     * @return Model
      * @throws LackOfCoffeeException
+     * @return Model
      */
     public function make()
     {
@@ -287,19 +296,30 @@ abstract class ModelGenerator extends BaseObject
         }, $filling);
 
         Std::each(function ($relation, $name) use (&$model) {
+            if (!$this->isBelongsTo($name)) {
+                return;
+            }
+
+            $model->$name()->associate(
+                $this->generateRelation($name)
+            );
+        }, $this->relations);
+
+        $model->save();
+
+        Std::each(function ($relation, $name) use (&$model) {
+            if ($this->isBelongsTo($name)) {
+                return;
+            }
+
             $related = $this->generateRelation($name);
 
-            if ($relation instanceof BelongsTo) {
-                $model->$name()->associate($related);
-            } elseif (is_array($related)) {
+            if (is_array($related)) {
                 $model->$name()->saveMany($related);
             } else {
                 $model->$name()->save($related);
             }
-
         }, $this->relations);
-
-        $model->save();
 
         return $model;
     }
@@ -307,7 +327,7 @@ abstract class ModelGenerator extends BaseObject
     /**
      * Generate multiple models.
      *
-     * @param integer $count
+     * @param int $count
      *
      * @return Model[]
      */
@@ -320,6 +340,18 @@ abstract class ModelGenerator extends BaseObject
         }
 
         return $models;
+    }
+
+    /**
+     * Return whether or not a relationship is a belongs to relation.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    protected function isBelongsTo($name)
+    {
+        return ($this->inspector->getRelation($name) instanceof BelongsTo);
     }
 
     /**

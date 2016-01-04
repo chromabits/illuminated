@@ -43,7 +43,8 @@ abstract class ApiCheckableRequest extends CheckableRequest
         Route $route,
         ApiResponseFactoryInterface $responseFactory
     ) {
-        parent::__construct($request, $route);
+        // TODO: Fix this with actual constructor injection.
+        parent::__construct($request, $route, app());
 
         $this->responseFactory = $responseFactory;
     }

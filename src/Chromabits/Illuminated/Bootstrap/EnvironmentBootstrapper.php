@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Copyright 2015, Eduardo Trujillo <ed@chromabits.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * This file is part of the Illuminated package
+ */
+
 namespace Chromabits\Illuminated\Bootstrap;
 
 use Chromabits\Illuminated\Bootstrap\Interfaces\BootstrapperInterface;
@@ -8,7 +17,7 @@ use Illuminate\Contracts\Foundation\Application;
 use InvalidArgumentException;
 
 /**
- * Class EnvironmentBootstrapper
+ * Class EnvironmentBootstrapper.
  *
  * @author Eduardo Trujillo <ed@chromabits.com>
  * @package Chromabits\Illuminated\Bootstrap
@@ -34,7 +43,7 @@ class EnvironmentBootstrapper implements BootstrapperInterface
         // Attempt to load the environment-specific .env
         try {
             Dotenv::load($app->environmentPath(), vsprintf('.%s.env', [
-                env('APP_ENV', static::DEFAULT_ENVIRONMENT)
+                env('APP_ENV', static::DEFAULT_ENVIRONMENT),
             ]));
         } catch (InvalidArgumentException $e) {
             //

@@ -13,7 +13,11 @@ namespace Chromabits\Illuminated\Conference\Views;
 
 use Chromabits\Illuminated\Alerts\Alert;
 use Chromabits\Illuminated\Contracts\Alerts\AlertManager;
+use Chromabits\Nucleus\Data\ArrayList;
+use Chromabits\Nucleus\Data\ArrayMap;
 use Chromabits\Nucleus\Foundation\BaseObject;
+use Chromabits\Nucleus\Foundation\Interfaces\ArrayableInterface;
+use Chromabits\Nucleus\Meditation\Constraints\AbstractConstraint;
 use Chromabits\Nucleus\Support\Std;
 use Chromabits\Nucleus\View\Common\Bold;
 use Chromabits\Nucleus\View\Common\Div;
@@ -89,19 +93,43 @@ class AlertPresenter extends BaseObject implements RenderableInterface
     {
         if (is_string($content)) {
             return $content;
-        } elseif (is_array($content)) {
-            return Std::map(function ($value, $key) {
-                if (is_numeric($key)) {
-                    return $value;
-                }
+        } elseif (is_array($content)
+            || $content instanceof ArrayableInterface
+        ) {
+            return ArrayMap::of($content)
+                ->map(function ($value, $key) {
+                    if (is_numeric($key)) {
+                        return $this->renderMessages($value);
+                    }
 
-                return new Paragraph([], [
-                    new Bold([], vsprintf('%s: ', [$key])),
-                    $value
-                ]);
-            }, $content);
+                    return new Paragraph([], [
+                        new Bold([], vsprintf('%s: ', [$key])),
+                        $this->renderMessages($value)
+                    ]);
+                })
+                ->toList();
         }
 
         return $content;
+    }
+
+    /**
+     * Render constraint into a string.
+     *
+     * @param AbstractConstraint|AbstractConstraint[] $constraints
+     *
+     * @return string
+     */
+    protected function renderMessages($constraints)
+    {
+        if ($constraints instanceof AbstractConstraint) {
+            return $constraints->getDescription();
+        }
+
+        return ArrayList::of($constraints)
+            ->map(function (AbstractConstraint $constraint) {
+                return $constraint->getDescription();
+            })
+            ->join('. ');
     }
 }

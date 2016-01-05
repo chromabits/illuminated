@@ -102,12 +102,10 @@ class ConferenceController extends BaseController
 
         // Show any alerts on the top of the panel (if any).
         if (count($this->alerts->peekAll()) > 0) {
-            $panel = new Div(
-                [], [
-                new AlertPresenter($this->alerts),
+            $panel = new Div([], [
+                new Div([], new AlertPresenter($this->alerts)),
                 $panel,
-            ]
-            );
+            ]);
         }
 
         if ($result->hasSidebar()) {

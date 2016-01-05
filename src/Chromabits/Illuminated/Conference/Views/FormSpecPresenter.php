@@ -9,6 +9,7 @@ use Chromabits\Nucleus\Exceptions\LackOfCoffeeException;
 use Chromabits\Nucleus\Foundation\BaseObject;
 use Chromabits\Nucleus\Meditation\Constraints\AbstractConstraint;
 use Chromabits\Nucleus\Meditation\Constraints\InArrayConstraint;
+use Chromabits\Nucleus\Meditation\Constraints\NumericConstraint;
 use Chromabits\Nucleus\Meditation\Constraints\PrimitiveTypeConstraint;
 use Chromabits\Nucleus\Meditation\Exceptions\InvalidArgumentException;
 use Chromabits\Nucleus\Meditation\FormSpec;
@@ -106,7 +107,9 @@ class FormSpecPresenter extends BaseObject implements
         // field.
         $type = $this->spec->getFieldType($fieldName);
 
-        if ($type instanceof PrimitiveTypeConstraint) {
+        if ($type instanceof PrimitiveTypeConstraint
+            || $type instanceof NumericConstraint
+        ) {
             $attributes = ArrayMap::of([
                 'id' => $fieldName,
                 'class' => 'form-control',
@@ -137,6 +140,7 @@ class FormSpecPresenter extends BaseObject implements
                     return new Input($attributes->toArray());
                 case ScalarTypes::SCALAR_INTEGER:
                 case ScalarTypes::SCALAR_FLOAT:
+                case '{numeric}':
                     $attributes = $attributes->insert('type', 'number');
                     $default = $this->spec->getFieldDefault($fieldName);
 

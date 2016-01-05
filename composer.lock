@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/chromabits/nucleus.git",
-                "reference": "7648363ad1f07864e4815efe5e87761ce0115056"
+                "reference": "c3640b5d281d093ee082e6ae18b54ce3c34ee488"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chromabits/nucleus/zipball/7648363ad1f07864e4815efe5e87761ce0115056",
-                "reference": "7648363ad1f07864e4815efe5e87761ce0115056",
+                "url": "https://api.github.com/repos/chromabits/nucleus/zipball/c3640b5d281d093ee082e6ae18b54ce3c34ee488",
+                "reference": "c3640b5d281d093ee082e6ae18b54ce3c34ee488",
                 "shasum": ""
             },
             "require": {
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "Some core PHP utilities",
-            "time": "2016-01-03 20:05:28"
+            "time": "2016-01-05 16:15:41"
         },
         {
             "name": "classpreloader/classpreloader",

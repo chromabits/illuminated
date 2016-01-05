@@ -14,6 +14,7 @@ namespace Chromabits\Illuminated\Database\Interfaces;
 use Chromabits\Illuminated\Meditation\Constraints\ExactlyOneRecordConstraint;
 use Chromabits\Nucleus\Exceptions\LackOfCoffeeException;
 use Chromabits\Nucleus\Meditation\Exceptions\InvalidArgumentException;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -160,4 +161,24 @@ interface BaseRepositoryInterface
      * @return bool
      */
     public function exists($id);
+
+    /**
+     * Create and save a new model with the provided attributes.
+     *
+     * @param array $attributes
+     *
+     * @return Model
+     * @throws LackOfCoffeeException
+     */
+    public function create($attributes = []);
+
+    /**
+     * Delete a model.
+     *
+     * @param int $id
+     *
+     * @return bool|null
+     * @throws Exception
+     */
+    public function deleteById($id);
 }

@@ -18,6 +18,7 @@ use Chromabits\Nucleus\Foundation\BaseObject;
 use Chromabits\Nucleus\Meditation\Arguments;
 use Chromabits\Nucleus\Meditation\Boa;
 use Chromabits\Nucleus\Meditation\Exceptions\InvalidArgumentException;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -307,5 +308,31 @@ abstract class BaseRepository extends BaseObject implements
         $this->applyWith($query, $with);
 
         return $query->firstOrFail($columns);
+    }
+
+    /**
+     * Create and save a new model with the provided attributes.
+     *
+     * @param array $attributes
+     *
+     * @return Model
+     * @throws LackOfCoffeeException
+     */
+    public function create($attributes = [])
+    {
+        return $this->makeModelInstance()->create($attributes);
+    }
+
+    /**
+     * Delete a model.
+     *
+     * @param int $id
+     *
+     * @return bool|null
+     * @throws Exception
+     */
+    public function deleteById($id)
+    {
+        return $this->getById($id, ['id'])->delete();
     }
 }

@@ -109,7 +109,9 @@ class FormSpecPresenter extends BaseObject implements
                             })
                     ));
                 } elseif ($constraint instanceof BooleanConstraint) {
-                    $attributes = $attributes->insert('type', 'checkbox');
+                    $attributes = $attributes
+                        ->insert('type', 'checkbox')
+                        ->insert('value', 'true');
                     $default = $this->spec->getFieldDefault($fieldName);
 
                     if ($default->isJust()) {
@@ -159,7 +161,9 @@ class FormSpecPresenter extends BaseObject implements
 
                     return new Input($attributes->toArray());
                 case ScalarTypes::SCALAR_BOOLEAN:
-                    $attributes = $attributes->insert('type', 'checkbox');
+                    $attributes = $attributes
+                        ->insert('type', 'checkbox')
+                        ->insert('value', 'true');
                     $default = $this->spec->getFieldDefault($fieldName);
 
                     if ($default->isJust()) {

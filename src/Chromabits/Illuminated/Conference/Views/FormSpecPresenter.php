@@ -8,6 +8,7 @@ use Chromabits\Nucleus\Data\ArrayMap;
 use Chromabits\Nucleus\Exceptions\LackOfCoffeeException;
 use Chromabits\Nucleus\Foundation\BaseObject;
 use Chromabits\Nucleus\Meditation\Constraints\AbstractConstraint;
+use Chromabits\Nucleus\Meditation\Constraints\BooleanConstraint;
 use Chromabits\Nucleus\Meditation\Constraints\InArrayConstraint;
 use Chromabits\Nucleus\Meditation\Constraints\NumericConstraint;
 use Chromabits\Nucleus\Meditation\Constraints\PrimitiveTypeConstraint;
@@ -80,23 +81,53 @@ class FormSpecPresenter extends BaseObject implements
         $constraints = $this->spec
             ->getFieldConstraints($fieldName)
             ->find(function (AbstractConstraint $constraint) {
-                return ($constraint instanceof InArrayConstraint);
+                return ($constraint instanceof InArrayConstraint
+                    || $constraint instanceof BooleanConstraint
+                    || $constraint instanceof NumericConstraint
+                );
             })
-            ->bind(function (InArrayConstraint $constraint) use ($fieldName) {
-                return Maybe::just(new Select(
-                    [
-                        'id' => $fieldName,
-                        'class' => 'c-select',
-                        'name' => $fieldName,
-                    ],
-                    ArrayList::of($constraint->getAllowed())
-                        ->map(function ($item) {
-                            return new Option(
-                                ['value' => (string) $item],
-                                (string) $item
-                            );
-                        })
-                ));
+            ->bind(function (AbstractConstraint $constraint) use ($fieldName) {
+                $attributes = ArrayMap::of([
+                    'id' => $fieldName,
+                    'class' => 'form-control',
+                    'name' => $fieldName,
+                ]);
+
+                if ($constraint instanceof InArrayConstraint) {
+                    return Maybe::just(new Select(
+                        [
+                            'id' => $fieldName,
+                            'class' => 'c-select',
+                            'name' => $fieldName,
+                        ],
+                        ArrayList::of($constraint->getAllowed())
+                            ->map(function ($item) {
+                                return new Option(
+                                    ['value' => (string) $item],
+                                    (string) $item
+                                );
+                            })
+                    ));
+                } elseif ($constraint instanceof BooleanConstraint) {
+                    $attributes = $attributes->insert('type', 'checkbox');
+                    $default = $this->spec->getFieldDefault($fieldName);
+
+                    if ($default->isJust()) {
+                        $attributes = $attributes->insert('checked', null);
+                    }
+                } elseif ($constraint instanceof NumericConstraint) {
+                    $attributes = $attributes->insert('type', 'number');
+                    $default = $this->spec->getFieldDefault($fieldName);
+
+                    if ($default->isJust()) {
+                        $attributes = $attributes->insert(
+                            'value',
+                            Maybe::fromJust($default)
+                        );
+                    }
+                }
+
+                return Maybe::just(new Input($attributes->toArray()));
             });
 
         if ($constraints->isJust()) {
@@ -107,9 +138,7 @@ class FormSpecPresenter extends BaseObject implements
         // field.
         $type = $this->spec->getFieldType($fieldName);
 
-        if ($type instanceof PrimitiveTypeConstraint
-            || $type instanceof NumericConstraint
-        ) {
+        if ($type instanceof PrimitiveTypeConstraint) {
             $attributes = ArrayMap::of([
                 'id' => $fieldName,
                 'class' => 'form-control',
@@ -140,7 +169,6 @@ class FormSpecPresenter extends BaseObject implements
                     return new Input($attributes->toArray());
                 case ScalarTypes::SCALAR_INTEGER:
                 case ScalarTypes::SCALAR_FLOAT:
-                case '{numeric}':
                     $attributes = $attributes->insert('type', 'number');
                     $default = $this->spec->getFieldDefault($fieldName);
 

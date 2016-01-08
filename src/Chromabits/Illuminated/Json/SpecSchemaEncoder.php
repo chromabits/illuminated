@@ -13,6 +13,7 @@ namespace Chromabits\Illuminated\Json;
 
 use Chromabits\Nucleus\Exceptions\CoreException;
 use Chromabits\Nucleus\Foundation\BaseObject;
+use Chromabits\Nucleus\Foundation\Interfaces\ArrayableInterface;
 use Chromabits\Nucleus\Meditation\Constraints\AbstractConstraint;
 use Chromabits\Nucleus\Meditation\Constraints\PrimitiveTypeConstraint;
 use Chromabits\Nucleus\Meditation\Primitives\CompoundTypes;
@@ -91,9 +92,13 @@ class SpecSchemaEncoder extends BaseObject
             }
 
             return $schema;
-        } elseif (is_array($input)) {
+        } elseif (is_array($input) || $input instanceof ArrayableInterface) {
             $schema = [];
             $descriptions = [];
+
+            if ($input instanceof ArrayableInterface) {
+                $input = $input->toArray();
+            }
 
             foreach ($input as $constraint) {
                 $descriptions[] = $constraint->getDescription();

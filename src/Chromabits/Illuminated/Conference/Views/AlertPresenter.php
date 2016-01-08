@@ -124,6 +124,8 @@ class AlertPresenter extends BaseObject implements RenderableInterface
     {
         if ($constraints instanceof AbstractConstraint) {
             return $constraints->getDescription();
+        } elseif (is_string($constraints)) {
+            return $constraints;
         }
 
         return ArrayList::of($constraints)

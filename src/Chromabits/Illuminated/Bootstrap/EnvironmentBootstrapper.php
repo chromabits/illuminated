@@ -12,7 +12,7 @@
 namespace Chromabits\Illuminated\Bootstrap;
 
 use Chromabits\Illuminated\Bootstrap\Interfaces\BootstrapperInterface;
-use Dotenv;
+use Dotenv\Dotenv;
 use Illuminate\Contracts\Foundation\Application;
 use InvalidArgumentException;
 
@@ -35,16 +35,18 @@ class EnvironmentBootstrapper implements BootstrapperInterface
     {
         // Attempt to load the default .env
         try {
-            Dotenv::load($app->environmentPath(), $app->environmentFile());
+            $env = new Dotenv($app->environmentPath(), $app->environmentFile());
+            $env->load();
         } catch (InvalidArgumentException $e) {
             //
         }
 
         // Attempt to load the environment-specific .env
         try {
-            Dotenv::load($app->environmentPath(), vsprintf('.%s.env', [
+            $env = new Dotenv($app->environmentPath(), vsprintf('.%s.env', [
                 env('APP_ENV', static::DEFAULT_ENVIRONMENT),
             ]));
+            $env->load();
         } catch (InvalidArgumentException $e) {
             //
         }

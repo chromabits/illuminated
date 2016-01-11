@@ -15,6 +15,7 @@ use Chromabits\Nucleus\Exceptions\LackOfCoffeeException;
 use Chromabits\Nucleus\Foundation\BaseObject;
 use Chromabits\Nucleus\Support\Std;
 
+use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
 
 /**
@@ -40,19 +41,37 @@ class ConferenceContext extends BaseObject
     protected $session;
 
     /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
      * Construct an instance of a ConferenceContext.
      *
      * @param string $basePath
      * @param SessionManager $session
+     * @param Request $request
      *
      * @throws LackOfCoffeeException
      */
-    public function __construct($basePath, SessionManager $session)
-    {
+    public function __construct(
+        $basePath,
+        SessionManager $session,
+        Request $request
+    ) {
         parent::__construct();
 
         $this->basePath = $basePath;
         $this->session = $session;
+        $this->request = $request;
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**
@@ -137,7 +156,8 @@ class ConferenceContext extends BaseObject
     public function lastUrl($secure = null)
     {
         if ($this->session->has(static::SESSION_LAST_MODULE)
-            && $this->session->has(static::SESSION_LAST_METHOD)) {
+            && $this->session->has(static::SESSION_LAST_METHOD)
+        ) {
             return $this->method(
                 $this->session->get(static::SESSION_LAST_MODULE),
                 $this->session->get(static::SESSION_LAST_METHOD),

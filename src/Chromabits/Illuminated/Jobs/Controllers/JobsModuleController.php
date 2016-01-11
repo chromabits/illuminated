@@ -11,14 +11,26 @@
 
 namespace Chromabits\Illuminated\Jobs\Controllers;
 
+use Carbon\Carbon;
 use Chromabits\Illuminated\Conference\Entities\ConferenceContext;
+use Chromabits\Illuminated\Conference\Views\ConferenceConfirmationCard;
 use Chromabits\Illuminated\Conference\Views\ConferencePaginator;
+use Chromabits\Illuminated\Conference\Views\ConferenceWideContainer;
+use Chromabits\Illuminated\Conference\Views\FormSpecPresenter;
 use Chromabits\Illuminated\Http\BaseController;
 use Chromabits\Illuminated\Jobs\Interfaces\HandlerResolverInterface;
 use Chromabits\Illuminated\Jobs\Interfaces\JobFactoryInterface;
 use Chromabits\Illuminated\Jobs\Interfaces\JobRepositoryInterface;
 use Chromabits\Illuminated\Jobs\Interfaces\JobSchedulerInterface;
 use Chromabits\Illuminated\Jobs\Job;
+use Chromabits\Illuminated\Jobs\Modules\JobsModule;
+use Chromabits\Illuminated\Jobs\Requests\CancelJobModuleRequest;
+use Chromabits\Illuminated\Jobs\Requests\CreateJobModuleRequest;
+use Chromabits\Illuminated\Jobs\Requests\DescribeJobModuleRequest;
+use Chromabits\Illuminated\Jobs\Views\ConferenceCreateJobButton;
+use Chromabits\Illuminated\Jobs\Views\ConferenceJobDetailsPresenter;
+use Chromabits\Illuminated\Jobs\Views\ConferenceJobTablePresenter;
+use Chromabits\Nucleus\Http\Enums\HttpMethods;
 use Chromabits\Nucleus\Support\Arr;
 use Chromabits\Nucleus\Support\Std;
 use Chromabits\Nucleus\View\Bootstrap\Card;
@@ -28,14 +40,14 @@ use Chromabits\Nucleus\View\Bootstrap\Column;
 use Chromabits\Nucleus\View\Bootstrap\Row;
 use Chromabits\Nucleus\View\Bootstrap\SimpleTable;
 use Chromabits\Nucleus\View\Common\Anchor;
-use Chromabits\Nucleus\View\Common\Button;
+use Chromabits\Nucleus\View\Common\Div;
 use Chromabits\Nucleus\View\Common\HeaderOne;
 use Chromabits\Nucleus\View\Common\HeaderSix;
-use Chromabits\Nucleus\View\Common\Italic;
 use Chromabits\Nucleus\View\Common\Paragraph;
 use Chromabits\Nucleus\View\Common\PreformattedText;
-use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 
 /**
  * Class JobsModuleController.
@@ -71,8 +83,14 @@ class JobsModuleController extends BaseController
     protected $request;
 
     /**
+     * @var ConferenceContext
+     */
+    protected $context;
+
+    /**
      * Construct an instance of a JobsModuleController.
      *
+     * @param ConferenceContext $context
      * @param JobRepositoryInterface $jobs
      * @param JobSchedulerInterface $scheduler
      * @param HandlerResolverInterface $resolver
@@ -80,12 +98,14 @@ class JobsModuleController extends BaseController
      * @param Request $request
      */
     public function __construct(
+        ConferenceContext $context,
         JobRepositoryInterface $jobs,
         JobSchedulerInterface $scheduler,
         HandlerResolverInterface $resolver,
         JobFactoryInterface $factory,
         Request $request
     ) {
+        $this->context = $context;
         $this->jobs = $jobs;
         $this->scheduler = $scheduler;
         $this->resolver = $resolver;
@@ -108,19 +128,99 @@ class JobsModuleController extends BaseController
                     new Column(['medium' => 6, 'class' => 'btn-y-align'], [
                         'All Jobs',
                     ]),
-                    new Column(['medium' => 6, 'class' => 'text-right'], [
-                        new Button(
-                            ['class' => 'btn btn-sm btn-primary-outline'],
-                            'Create new job'
-                        ),
-                    ]),
+                    new ConferenceCreateJobButton($this->context),
                 ]),
             ]),
-            $this->renderJobsTable($jobs),
+            new ConferenceJobTablePresenter($this->context, $jobs->items()),
             new ConferencePaginator($jobs),
         ]);
     }
 
+    /**
+     * Describe a single job.
+     *
+     * @param DescribeJobModuleRequest $request
+     * @param JobRepositoryInterface $jobRepository
+     *
+     * @return Div
+     */
+    public function getSingle(
+        DescribeJobModuleRequest $request,
+        JobRepositoryInterface $jobRepository
+    ) {
+        $job = $jobRepository->getById((int) $request->get('id'));
+
+        return new Div([], [
+            new ConferenceJobDetailsPresenter($this->context, $job),
+        ]);
+    }
+
+    /**
+     * Get form for creating a new task.
+     *
+     * @return Div
+     */
+    public function getCreate()
+    {
+        return new Div([], [
+            new Card([], [
+                new CardHeader([], 'Create a new job'),
+                new CardBlock([], [
+                    new FormSpecPresenter(
+                        CreateJobModuleRequest::getFormSpec($this->resolver),
+                        [
+                            'method' => HttpMethods::POST,
+                            'action' => $this->context
+                                ->method(JobsModule::NAME, 'create.post'),
+                        ]
+                    ),
+                ]),
+            ]),
+        ]);
+    }
+
+    /**
+     * Create a new job.
+     *
+     * @param CreateJobModuleRequest $request
+     * @param JobFactoryInterface $jobFactory
+     * @param JobSchedulerInterface $jobScheduler
+     * @param Redirector $redirector
+     *
+     * @return string
+     */
+    public function postCreate(
+        CreateJobModuleRequest $request,
+        JobFactoryInterface $jobFactory,
+        JobSchedulerInterface $jobScheduler,
+        Redirector $redirector
+    ) {
+        $job = $jobFactory->make(
+            $request->get('task'),
+            $request->get('payload'),
+            (int) $request->get('retries')
+        );
+
+        if ($request->request->has('expire_at')) {
+            $job->expires_at = Carbon::parse(
+                $request->request->get('expire_at')
+            );
+        }
+
+        $jobScheduler->push($job, Carbon::parse($request->get('run_at')));
+
+        return $redirector->to($this->context->method(
+            JobsModule::NAME,
+            'single',
+            ['id' => $job->id]
+        ));
+    }
+
+    /**
+     * Index all scheduled jobs.
+     *
+     * @return Card
+     */
     public function getScheduled()
     {
         $jobs = $this->jobs->getScheduledPaginated();
@@ -131,19 +231,19 @@ class JobsModuleController extends BaseController
                     new Column(['medium' => 6, 'class' => 'btn-y-align'], [
                         'Scheduled Jobs',
                     ]),
-                    new Column(['medium' => 6, 'class' => 'text-right'], [
-                        new Button(
-                            ['class' => 'btn btn-sm btn-primary-outline'],
-                            'Create new job'
-                        ),
-                    ]),
+                    new ConferenceCreateJobButton($this->context),
                 ]),
             ]),
-            $this->renderJobsTable($jobs),
+            new ConferenceJobTablePresenter($this->context, $jobs->items()),
             new ConferencePaginator($jobs),
         ]);
     }
 
+    /**
+     * Index all queued jobs.
+     *
+     * @return Card
+     */
     public function getQueued()
     {
         $jobs = $this->jobs->getQueuedPaginated();
@@ -154,19 +254,19 @@ class JobsModuleController extends BaseController
                     new Column(['medium' => 6, 'class' => 'btn-y-align'], [
                         'Queued Jobs',
                     ]),
-                    new Column(['medium' => 6, 'class' => 'text-right'], [
-                        new Button(
-                            ['class' => 'btn btn-sm btn-primary-outline'],
-                            'Create new job'
-                        ),
-                    ]),
+                    new ConferenceCreateJobButton($this->context),
                 ]),
             ]),
-            $this->renderJobsTable($jobs),
+            new ConferenceJobTablePresenter($this->context, $jobs->items()),
             new ConferencePaginator($jobs),
         ]);
     }
 
+    /**
+     * Index all failed jobs.
+     *
+     * @return Card
+     */
     public function getFailed()
     {
         $jobs = $this->jobs->getFailedPaginated();
@@ -177,19 +277,22 @@ class JobsModuleController extends BaseController
                     new Column(['medium' => 6, 'class' => 'btn-y-align'], [
                         'Failed Jobs',
                     ]),
-                    new Column(['medium' => 6, 'class' => 'text-right'], [
-                        new Button(
-                            ['class' => 'btn btn-sm btn-primary-outline'],
-                            'Create new job'
-                        ),
-                    ]),
+                    new ConferenceCreateJobButton($this->context),
                 ]),
             ]),
-            $this->renderJobsTable($jobs),
+            new ConferenceJobTablePresenter($this->context, $jobs->items()),
             new ConferencePaginator($jobs),
         ]);
     }
 
+    /**
+     * Index all available tasks.
+     *
+     * @param HandlerResolverInterface $resolver
+     * @param ConferenceContext $context
+     *
+     * @return Card
+     */
     public function getReference(
         HandlerResolverInterface $resolver,
         ConferenceContext $context
@@ -211,11 +314,21 @@ class JobsModuleController extends BaseController
                         ], $taskName),
                         $instance->getDescription(),
                     ];
-                }, $resolver->getAvailableTasks())
+                },
+                    $resolver->getAvailableTasks())
             ),
         ]);
     }
 
+    /**
+     * Describe a single task.
+     *
+     * @param HandlerResolverInterface $resolver
+     * @param ConferenceContext $context
+     * @param Request $request
+     *
+     * @return Card
+     */
     public function getReferenceSingle(
         HandlerResolverInterface $resolver,
         ConferenceContext $context,
@@ -234,14 +347,17 @@ class JobsModuleController extends BaseController
             ]),
             new SimpleTable(
                 ['Field Name', 'Type', 'Default', 'Description'],
-                Std::map(function ($description, $field) use ($types, $defaults) {
-                    return [
-                        $field,
-                        Arr::dotGet($types, $field, '-'),
-                        (string) Arr::dotGet($defaults, $field, '-'),
-                        $description,
-                    ];
-                }, $handler->getReference())
+                Std::map(
+                    function ($description, $field) use ($types, $defaults) {
+                        return [
+                            $field,
+                            Arr::dotGet($types, $field, '-'),
+                            (string) Arr::dotGet($defaults, $field, '-'),
+                            $description,
+                        ];
+                    },
+                    $handler->getReference()
+                )
             ),
             new CardBlock([], [
                 new HeaderSix([], 'Example usage:'),
@@ -254,50 +370,44 @@ class JobsModuleController extends BaseController
     }
 
     /**
-     * Render a table showing jobs.
+     * Cancel a job.
      *
-     * @param Paginator $jobs
+     * @param CancelJobModuleRequest $request
+     * @param JobRepositoryInterface $jobRepository
+     * @param JobSchedulerInterface $jobScheduler
+     * @param Redirector $redirector
      *
-     * @return mixed
+     * @return ConferenceWideContainer|RedirectResponse
      */
-    protected function renderJobsTable(Paginator $jobs)
-    {
-        return Std::firstBias(
-            count($jobs->items()) > 0,
-            function () use ($jobs) {
-                return new SimpleTable(
-                    [
-                        'ID', 'Task', 'State', 'Runs', 'Created At',
-                        'Duration',
-                    ],
-                    Std::map(
-                        function (Job $job) {
-                            return [
-                                $job->id,
-                                $job->state,
-                                $job->task,
-                                $job->attempts,
-                                $job->created_at->toDayDateTimeString(),
-                                $job->getExecutionTime(),
-                            ];
-                        },
-                        $jobs->items()
-                    )
-                );
-            },
-            function () {
-                return new CardBlock(
-                    ['class' => 'card-block text-center'],
-                    [
-                        new Paragraph([], [
-                            new Italic(
-                                ['class' => 'fa fa-4x fa-search text-light']
-                            ),
-                        ]),
-                        'No jobs found matching the specified criteria.',
-                    ]
-                );
-            }
+    public function getCancel(
+        CancelJobModuleRequest $request,
+        JobRepositoryInterface $jobRepository,
+        JobSchedulerInterface $jobScheduler,
+        Redirector $redirector
+    ) {
+        /** @var Job $job */
+        $job = $jobRepository->getById((int) $request->get('id'));
+
+        if ($request->get('confirm')) {
+            $jobScheduler->cancel($job);
+
+            return $redirector->to($this->context->method(
+                JobsModule::NAME,
+                'single',
+                ['id' => $job->id]
+            ));
+        }
+
+        return new ConferenceWideContainer(
+            new Row([], [
+                new Column(['class' => 'col-md-6 col-md-offset-3'], [
+                    (new ConferenceConfirmationCard($this->context))
+                        ->withDescription(vsprintf(
+                            'Cancel job with ID %s (Task: %s)',
+                            [$job->id, $job->task]
+                        )),
+                ]),
+            ])
         );
     }
 }

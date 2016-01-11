@@ -14,6 +14,7 @@ use Chromabits\Illuminated\Conference\Entities\SidebarPanelPair;
 use Chromabits\Illuminated\Conference\Interfaces\DashboardInterface;
 use Chromabits\Illuminated\Conference\Views\AlertPresenter;
 use Chromabits\Illuminated\Conference\Views\ConferencePage;
+use Chromabits\Illuminated\Conference\Views\ConferenceWideContainer;
 use Chromabits\Illuminated\Contracts\Alerts\AlertManager;
 use Chromabits\Illuminated\Http\BaseController;
 use Chromabits\Nucleus\View\Common\Div;
@@ -108,22 +109,20 @@ class ConferenceController extends BaseController
             ]);
         }
 
-        if ($result->hasSidebar()) {
-            return (
-            new ConferencePage(
+        if ($result->hasSidebar()
+            && !$panel instanceof ConferenceWideContainer
+        ) {
+            return (new ConferencePage(
                 $this->context,
                 $this->dashboard,
                 $panel,
                 $result->getSidebar()
-            )
-            )->render();
+            ))->render();
         }
 
-        return (
-        new ConferencePage(
+        return (new ConferencePage(
             $this->context, $this->dashboard, $panel
-        )
-        )->render();
+        ))->render();
     }
 
     /**

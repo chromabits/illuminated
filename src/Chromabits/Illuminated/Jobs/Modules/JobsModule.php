@@ -25,11 +25,18 @@ use Illuminate\Contracts\Container\Container;
  */
 class JobsModule extends Module
 {
+    const NAME = 'illuminated.jobs';
+
     /**
      * @var Container
      */
     protected $container;
 
+    /**
+     * Construct an instance of a JobsModule.
+     *
+     * @param Container $container
+     */
     public function __construct(Container $container)
     {
         parent::__construct();
@@ -41,6 +48,31 @@ class JobsModule extends Module
             JobsModuleController::class,
             'getIndex',
             'All Jobs'
+        );
+
+        $this->registerHidden(
+            'single',
+            JobsModuleController::class,
+            'getSingle'
+        );
+
+        $this->registerHidden(
+            'cancel',
+            JobsModuleController::class,
+            'getCancel'
+        );
+
+        $this->register(
+            'create',
+            JobsModuleController::class,
+            'getCreate',
+            'Create new job'
+        );
+
+        $this->registerHidden(
+            'create.post',
+            JobsModuleController::class,
+            'postCreate'
         );
 
         $this->register(
@@ -81,6 +113,9 @@ class JobsModule extends Module
         );
     }
 
+    /**
+     * @throws CoreException
+     */
     public function boot()
     {
         parent::boot();
@@ -99,7 +134,7 @@ class JobsModule extends Module
      */
     public function getName()
     {
-        return 'illuminated.jobs';
+        return static::NAME;
     }
 
     /**

@@ -196,7 +196,7 @@ class ConferencePage implements RenderableInterface, SafeHtmlProducerInterface
                         'src' => 'https://cdn.rawgit.com/twbs/bootstrap/v4-dev/'
                             . 'dist/js/bootstrap.js',
                     ]
-                ),
+                )
             ], [
                 new Meta(['charset' => 'utf-8']),
                 new Meta(
@@ -250,7 +250,7 @@ class ConferencePage implements RenderableInterface, SafeHtmlProducerInterface
             return new Container(
                 [], [
                     new Row(
-                        [], [
+                        ['class' => 'p-y-1'], [
                             new Column(
                                 ['medium' => 12],
                                 $this->panel

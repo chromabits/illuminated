@@ -138,7 +138,8 @@ class Dashboard extends BaseObject implements DashboardInterface
 
         return new SidebarPanelPair(
             $module->renderSidebar($context),
-            $this->resolveMethod($module, $method)
+            $this
+                ->resolveMethod($module, $method)
                 ->setContainer($this->application)
                 ->run($request)
         );
@@ -171,7 +172,7 @@ class Dashboard extends BaseObject implements DashboardInterface
      * Resolve a method inside a module.
      *
      * @param Module $module
-     * @param null $methodName
+     * @param string|null $methodName
      *
      * @throws MethodNotFoundException
      * @return mixed

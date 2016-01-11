@@ -2,6 +2,7 @@
 
 namespace Chromabits\Illuminated\Conference\Views;
 
+use Chromabits\Illuminated\Meditation\Constraints\DateTimeStringConstraint;
 use Chromabits\Nucleus\Control\Maybe;
 use Chromabits\Nucleus\Data\ArrayList;
 use Chromabits\Nucleus\Data\ArrayMap;
@@ -25,6 +26,7 @@ use Chromabits\Nucleus\View\Common\Option;
 use Chromabits\Nucleus\View\Common\Paragraph;
 use Chromabits\Nucleus\View\Common\Select;
 use Chromabits\Nucleus\View\Common\Small;
+use Chromabits\Nucleus\View\Common\TextArea;
 use Chromabits\Nucleus\View\Interfaces\RenderableInterface;
 use Chromabits\Nucleus\View\Interfaces\SafeHtmlProducerInterface;
 use Chromabits\Nucleus\View\Node;
@@ -84,6 +86,7 @@ class FormSpecPresenter extends BaseObject implements
                 return ($constraint instanceof InArrayConstraint
                     || $constraint instanceof BooleanConstraint
                     || $constraint instanceof NumericConstraint
+                    || $constraint instanceof DateTimeStringConstraint
                 );
             })
             ->bind(function (AbstractConstraint $constraint) use ($fieldName) {
@@ -127,6 +130,16 @@ class FormSpecPresenter extends BaseObject implements
                             Maybe::fromJust($default)
                         );
                     }
+                } elseif ($constraint instanceof DateTimeStringConstraint) {
+                    $attributes = $attributes->insert('type', 'datetime');
+                    $default = $this->spec->getFieldDefault($fieldName);
+
+                    if ($default->isJust()) {
+                        $attributes = $attributes->insert(
+                            'value',
+                            Maybe::fromJust($default)
+                        );
+                    }
                 }
 
                 return Maybe::just(new Input($attributes->toArray()));
@@ -151,11 +164,26 @@ class FormSpecPresenter extends BaseObject implements
                 case ScalarTypes::SCALAR_STRING:
                     $attributes = $attributes->insert('type', 'text');
                     $default = $this->spec->getFieldDefault($fieldName);
+                    $isTextArea = $this->spec->getFieldAnnotation(
+                        $fieldName,
+                        'textarea'
+                    );
 
                     if ($default->isJust()) {
                         $attributes = $attributes->insert(
                             'value',
                             Maybe::fromJust($default)
+                        );
+                    }
+
+                    if ($isTextArea->isJust()
+                        && Maybe::fromJust($isTextArea) === true
+                    ) {
+                        return new TextArea(
+                            $attributes
+                                ->delete('value')
+                                ->toArray(),
+                            Maybe::fromMaybe('', $attributes->lookup('value'))
                         );
                     }
 
@@ -208,6 +236,8 @@ class FormSpecPresenter extends BaseObject implements
     protected function renderFullField($fieldName)
     {
         $fieldNodes = $this->renderField($fieldName);
+        $fieldNotes = ArrayList::zero();
+        $fieldRequired = $this->spec->getFieldRequired($fieldName);
 
         if (!is_array($fieldNodes)) {
             $nodes = ArrayList::of([$fieldNodes]);
@@ -215,14 +245,28 @@ class FormSpecPresenter extends BaseObject implements
             $nodes = ArrayList::of($fieldNodes);
         }
 
+        if ($fieldRequired) {
+            $fieldNotes = $fieldNotes->append(ArrayList::of([
+                new Small(['class' => 'text-warning'], 'Required. '),
+            ]));
+        }
+
         if ($this->spec->getFieldDescription($fieldName)->isJust()) {
-            $nodes = $nodes->append(ArrayList::of([
-                new Paragraph([], new Small(['class' => 'text-muted'], [
+            $fieldNotes = $fieldNotes->append(ArrayList::of([
+                new Small(['class' => 'text-muted'], [
                     Maybe::fromJust(
                         $this->spec->getFieldDescription($fieldName)
                     )
-                ]))
+                ]),
             ]));
+        }
+
+        if ($fieldNotes->count() > 0) {
+            return $nodes
+                ->append(ArrayList::of([
+                    new Paragraph([], $fieldNotes)
+                ]))
+                ->toArray();
         }
 
         return $nodes->toArray();
@@ -249,7 +293,7 @@ class FormSpecPresenter extends BaseObject implements
                             'label',
                             ['class' => 'col-sm-2 form-control-label'],
                             Maybe::fromMaybe(
-                                '',
+                                vsprintf('%s:', [$key]),
                                 $this->spec
                                     ->getFieldLabel($key)
                                     ->bind($addColon)

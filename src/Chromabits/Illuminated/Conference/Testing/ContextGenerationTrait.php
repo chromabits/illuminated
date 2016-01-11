@@ -3,6 +3,7 @@
 namespace Chromabits\Illuminated\Conference\Testing;
 
 use Chromabits\Illuminated\Conference\Entities\ConferenceContext;
+use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
 use Mockery;
 
@@ -25,7 +26,9 @@ trait ContextGenerationTrait
     {
         /** @var SessionManager $session */
         $session = Mockery::mock(SessionManager::class);
+        /** @var Request $request */
+        $request = Mockery::mock(Request::class);
 
-        return new ConferenceContext($path, $session);
+        return new ConferenceContext($path, $session, $request);
     }
 }

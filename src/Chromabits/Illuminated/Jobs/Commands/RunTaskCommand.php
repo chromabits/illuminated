@@ -111,7 +111,12 @@ class RunTaskCommand extends Command implements SelfHandling, ShouldQueue
             $this->jobs->started($job, "Task handler started.\n");
             $handler->fire($job, $this->scheduler);
 
-            $this->jobs->complete($job);
+            if ($handler->isSelfDeleting()) {
+                $this->jobs->delete($job->id);
+            } else {
+                $this->jobs->complete($job);
+            }
+
         } catch (ModelNotFoundException $e) {
             // Here we just cancel the queue job since there is no point in
             // retrying.

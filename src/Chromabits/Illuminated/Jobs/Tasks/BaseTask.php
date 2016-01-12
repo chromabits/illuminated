@@ -148,7 +148,7 @@ abstract class BaseTask extends BaseObject
     }
 
     /**
-     * Whether the jobs should
+     * Whether the jobs should be deleted after completing
      *
      * @return bool
      */

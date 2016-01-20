@@ -14,11 +14,10 @@ use Chromabits\Nucleus\View\Bootstrap\CardBlock;
 use Chromabits\Nucleus\View\Bootstrap\CardHeader;
 use Chromabits\Nucleus\View\Common\Bold;
 use Chromabits\Nucleus\View\Common\Code;
-use Chromabits\Nucleus\View\Common\HeaderSix;
 use Chromabits\Nucleus\View\Common\HorizontalLine;
 use Chromabits\Nucleus\View\Common\PreformattedText;
-use SellerLabs\Slapp\Support\Views\ValueList;
-use SellerLabs\Slapp\Support\Views\ValuePresenter;
+use Chromabits\Illuminated\Conference\Views\ValueList;
+use Chromabits\Illuminated\Conference\Views\ValuePresenter;
 
 class ConferenceJobDetailsPresenter extends BaseHtmlRenderable
 {

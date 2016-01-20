@@ -12,7 +12,7 @@ use Chromabits\Nucleus\View\Bootstrap\CardBlock;
 use Chromabits\Nucleus\View\Bootstrap\SimpleTable;
 use Chromabits\Nucleus\View\Common\Italic;
 use Chromabits\Nucleus\View\Common\Paragraph;
-use SellerLabs\Slapp\Support\Views\ValuePresenter;
+use Chromabits\Illuminated\Conference\Views\ValuePresenter;
 
 /**
  * Class ConferenceJobTablePresenter

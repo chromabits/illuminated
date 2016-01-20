@@ -45,7 +45,7 @@ abstract class BaseTask extends BaseObject
 
     /**
      * Should jobs be deleted when they are completed
-     * 
+     *
      * @var bool
      */
     protected $selfDeleting = false;
@@ -108,15 +108,17 @@ abstract class BaseTask extends BaseObject
                     return $field->toString();
                 }
 
-                return implode(' ^ ', Std::map(function ($innerField) {
-                    if ($innerField instanceof Spec) {
-                        return '{spec}';
-                    } elseif ($innerField instanceof AbstractConstraint) {
-                        return $innerField->toString();
-                    }
+                return $field
+                    ->map(function ($innerField) {
+                        if ($innerField instanceof Spec) {
+                            return '{spec}';
+                        } elseif ($innerField instanceof AbstractConstraint) {
+                            return $innerField->toString();
+                        }
 
-                    return '{???}';
-                }, $field));
+                        return '{???}';
+                    })
+                    ->join(' ^ ');
             }, $this->spec->getConstraints());
         }
 

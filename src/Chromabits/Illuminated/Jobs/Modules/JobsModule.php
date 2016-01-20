@@ -162,4 +162,12 @@ class JobsModule extends Module
     {
         return 'index';
     }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return 'fa-cogs';
+    }
 }

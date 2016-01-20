@@ -12,7 +12,7 @@
 namespace Chromabits\Illuminated\Database\Console\Migrations;
 
 use Illuminate\Database\Migrations\MigrationCreator;
-use Illuminate\Foundation\Composer;
+use Illuminate\Support\Composer;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -46,7 +46,7 @@ class MigrateMakeCommand extends BaseCommand
     protected $creator;
 
     /**
-     * @var \Illuminate\Foundation\Composer
+     * @var Composer
      */
     protected $composer;
 

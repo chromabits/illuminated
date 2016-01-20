@@ -88,7 +88,7 @@ class ModelInspector extends BaseObject
 
         $relations = Std::filter(
             function (Relation $relation) use ($modelClass) {
-                return (get_class($relation->getRelated()) ===  $modelClass);
+                return (get_class($relation->getRelated()) === $modelClass);
             },
             $relations
         );

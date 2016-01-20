@@ -2,8 +2,7 @@
 
 namespace Chromabits\Illuminated\Conference\Views;
 
-use Chromabits\Illuminated\Conference\Views\DescriptionList;
-use Chromabits\Illuminated\Database\Articulate\Model;
+
 
 /**
  * Class ValueList

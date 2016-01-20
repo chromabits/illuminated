@@ -76,7 +76,7 @@ class HmacSigner extends BaseObject
     /**
      * Generate the content hash using the content string and the current date.
      *
-     * @param $content
+     * @param string $content
      *
      * @return string
      */

@@ -133,6 +133,12 @@ class RamlEncoder extends BaseObject implements RamlEncoderInterface
         return str_replace("---\n", "#%RAML 0.8\n", $yaml);
     }
 
+    /**
+     * @param ResourceFactory $resource
+     * @param RamlEncoderOptions $options
+     *
+     * @return array
+     */
     protected function encodeResource(
         ResourceFactory $resource,
         RamlEncoderOptions $options
@@ -292,8 +298,7 @@ class RamlEncoder extends BaseObject implements RamlEncoderInterface
 
         foreach ($fields as $field) {
             if (in_array($field, $parameters)) {
-                $uriParameters[$field]
-                    = $this->specFieldToParameter(
+                $uriParameters[$field] = $this->specFieldToParameter(
                     $spec,
                     $field
                 );

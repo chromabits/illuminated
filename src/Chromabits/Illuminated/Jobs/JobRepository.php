@@ -14,7 +14,7 @@ namespace Chromabits\Illuminated\Jobs;
 use Carbon\Carbon;
 use Chromabits\Illuminated\Database\BaseRepository;
 use Chromabits\Illuminated\Jobs\Interfaces\JobRepositoryInterface;
-use Chromabits\Nucleus\Foundation\BaseObject;
+
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\Paginator;
 

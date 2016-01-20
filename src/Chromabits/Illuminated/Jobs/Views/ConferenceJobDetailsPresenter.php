@@ -19,6 +19,12 @@ use Chromabits\Nucleus\View\Common\PreformattedText;
 use Chromabits\Illuminated\Conference\Views\ValueList;
 use Chromabits\Illuminated\Conference\Views\ValuePresenter;
 
+/**
+ * Class ConferenceJobDetailsPresenter
+ *
+ * @author Eduardo Trujillo <ed@chromabits.com>
+ * @package Chromabits\Illuminated\Jobs\Views
+ */
 class ConferenceJobDetailsPresenter extends BaseHtmlRenderable
 {
     /**

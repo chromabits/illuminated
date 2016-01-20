@@ -214,8 +214,9 @@ abstract class RamlSecurityScheme extends BaseObject implements
                             },
                             $this->queryParameters
                         ),
-                        'responses' => $this->responses ?
-                            $this->responses->toArray() : null,
+                        'responses' => $this->responses
+                            ? $this->responses->toArray()
+                            : null,
                     ]
                 ),
                 'settings' => $this->settings,

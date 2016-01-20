@@ -24,7 +24,7 @@ use ReflectionParameter;
  * Class ControllerReflector.
  *
  * @author Eduardo Trujillo <ed@chromabits.com>
- * @package Chromabits\Illuminated\Foundation
+ * @package Chromabits\Illuminated\Http
  */
 class ResourceReflector extends BaseObject
 {

@@ -111,7 +111,7 @@ class RequestFactory extends BaseObject
     /**
      * Set the request URI.
      *
-     * @param $uri
+     * @param string $uri
      *
      * @throws InvalidArgumentException
      * @return $this
@@ -128,8 +128,8 @@ class RequestFactory extends BaseObject
     /**
      * Set a header in the request.
      *
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param string $value
      *
      * @throws InvalidArgumentException
      * @return $this
@@ -149,7 +149,7 @@ class RequestFactory extends BaseObject
     /**
      * Set the HTTP method using the request.
      *
-     * @param $method
+     * @param string $method
      *
      * @throws InvalidArgumentException
      * @return $this

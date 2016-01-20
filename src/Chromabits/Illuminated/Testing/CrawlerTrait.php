@@ -427,7 +427,9 @@ trait CrawlerTrait
         $field = $this->filterByNameOrId($selector, ['input', 'textarea']);
 
         if ($field->count() == 0) {
-            throw new Exception("There are no elements with the name or ID [$selector].");
+            throw new Exception(
+                "There are no elements with the name or ID [$selector]."
+            );
         }
 
         $element = $field->nodeName();
@@ -440,7 +442,9 @@ trait CrawlerTrait
             return $field->text();
         }
 
-        throw new Exception("Given selector [$selector] is not an input or textarea.");
+        throw new Exception(
+            "Given selector [$selector] is not an input or textarea."
+        );
     }
 
     /**
@@ -626,8 +630,7 @@ trait CrawlerTrait
     protected function getCheckedValueFromRadioGroup(Crawler $radioGroup)
     {
         if ($radioGroup->nodeName() !== 'input'
-            || $radioGroup->attr('type')
-            !== 'radio'
+            || $radioGroup->attr('type') !== 'radio'
         ) {
             throw new Exception('Given element is not a radio button.');
         }

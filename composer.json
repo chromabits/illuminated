@@ -12,7 +12,7 @@
     "tijsverkoyen/css-to-inline-styles": "~1.5",
     "chromabits/nucleus": "0.5.x-dev",
     "league/commonmark": "^0.12",
-    "vlucas/phpdotenv": "~1.0"
+    "vlucas/phpdotenv": "~2.0"
   },
   "authors": [
     {

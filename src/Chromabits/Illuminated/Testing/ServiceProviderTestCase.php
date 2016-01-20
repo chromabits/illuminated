@@ -14,6 +14,7 @@ namespace Chromabits\Illuminated\Testing;
 use Chromabits\Nucleus\Meditation\Primitives\CompoundTypes;
 use Chromabits\Nucleus\Testing\TestCase;
 use Illuminate\Console\Application as ConsoleApplication;
+use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
@@ -123,9 +124,7 @@ abstract class ServiceProviderTestCase extends TestCase
 
         /** @var Dispatcher $events */
         $events = $app['events'];
-        $events->fire('artisan.start', [
-            'artisan' => $artisan,
-        ]);
+        $events->fire(new ArtisanStarting($artisan));
 
         $this->assertEquals($this->getCommands(), $recordedCommands);
     }

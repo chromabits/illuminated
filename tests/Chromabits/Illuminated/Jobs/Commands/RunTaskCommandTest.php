@@ -20,8 +20,10 @@ use Chromabits\Illuminated\Jobs\Job;
 use Chromabits\Illuminated\Jobs\JobState;
 use Chromabits\Illuminated\Jobs\Tasks\BaseTask;
 use Chromabits\Nucleus\Meditation\Boa;
+use Chromabits\Nucleus\Meditation\Primitives\ScalarTypes;
 use Chromabits\Nucleus\Meditation\Spec;
 use Chromabits\Nucleus\Testing\Impersonator;
+use Chromabits\Nucleus\Testing\Traits\ImpersonationTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Queue\Jobs\Job as LaravelJob;
 use Mockery as m;
@@ -37,7 +39,7 @@ use Tests\Chromabits\Support\IlluminatedTestCase;
  */
 class RunTaskCommandTest extends IlluminatedTestCase
 {
-    use JobsDatabaseTrait;
+    use JobsDatabaseTrait, ImpersonationTrait;
 
     /**
      * Setup the test.
@@ -63,41 +65,29 @@ class RunTaskCommandTest extends IlluminatedTestCase
         $job = new Job();
         $job->state = JobState::QUEUED;
 
-        $handler = m::mock(BaseTask::class);
-        $handler->shouldReceive('fire')->with(
-            $job,
-            m::type(JobSchedulerInterface::class)
-        )->atLeast()->once();
-        $handler->shouldReceive('getSpec')->andReturnNull();
+        $handler = $this->expectationsToMock(BaseTask::class, [
+            $this->on('fire', [$job, m::type(JobSchedulerInterface::class)]),
+            $this->on('getSpec', []),
+            $this->on('isSelfDeleting', [], false),
+        ]);
 
-        $impersonator = new Impersonator();
-
-        $impersonator->mock(
-            JobRepositoryInterface::class,
-            function (MockInterface $mock) use ($job) {
-                $mock->shouldReceive('find')->with(1337)->atLeast()->once()
-                    ->andReturn($job);
-
-                $mock->shouldReceive('started')->with($job, m::type('string'))
-                    ->atLeast()->once();
-
-                $mock->shouldReceive('complete')->with($job)
-                    ->atLeast()->once();
-            }
-        );
-
-        $impersonator->mock(
-            HandlerResolverInterface::class,
-            function (MockInterface $mock) use ($job, $handler) {
-                $mock->shouldReceive('resolve')->with($job)->atLeast()->once()
-                    ->andReturn($handler);
-            }
-        );
-
-        /** @var RunTaskCommand $command */
-        $command = $impersonator->make(RunTaskCommand::class);
-
-        $command->fire($laravelJob, ['job_id' => 1337]);
+        $this
+            ->impersonator()
+            ->mock(JobRepositoryInterface::class, [
+                $this->on('find', [1337], $job),
+                $this->on(
+                    'started',
+                    [$job, m::type(ScalarTypes::SCALAR_STRING)]
+                ),
+                $this->on('complete', [$job])
+            ])
+            ->mock(HandlerResolverInterface::class, [
+                $this->on('resolve', [$job], $handler),
+            ])
+            ->makeAndCall(RunTaskCommand::class, 'fire', [
+                'laravelJob' => $laravelJob,
+                'data' => ['job_id' => 1337],
+            ]);
     }
 
     public function testFireWithNoFound()
@@ -265,16 +255,15 @@ class RunTaskCommandTest extends IlluminatedTestCase
             'why_not' => 'because',
         ]);
 
-        $handler = m::mock(BaseTask::class);
-        $handler->shouldReceive('fire')->with(
-            $job,
-            m::type(JobSchedulerInterface::class)
-        )->atLeast()->once();
-        $handler->shouldReceive('getSpec')->andReturn(Spec::define([
-            'omg' => Boa::boolean(),
-        ], [
-            'yes' => 'please',
-        ], ['why_not']));
+        $handler = $this->expectationsToMock(BaseTask::class, [
+            $this->on('fire', [$job, m::type(JobSchedulerInterface::class)]),
+            $this->on('getSpec', [], Spec::define(
+                ['omg' => Boa::boolean()],
+                ['yes' => 'please'],
+                ['why_not'])
+            ),
+            $this->on('isSelfDeleting', [], false),
+        ]);
 
         $impersonator = new Impersonator();
 

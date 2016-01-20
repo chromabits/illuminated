@@ -44,6 +44,13 @@ abstract class BaseTask extends BaseObject
     protected $spec = null;
 
     /**
+     * Should jobs be deleted when they are completed
+     * 
+     * @var bool
+     */
+    protected $selfDeleting = false;
+
+    /**
      * Construct an instance of a BaseTask.
      *
      * @throws LackOfCoffeeException
@@ -138,5 +145,15 @@ abstract class BaseTask extends BaseObject
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Whether the jobs should be deleted after completing
+     *
+     * @return bool
+     */
+    public function isSelfDeleting()
+    {
+        return $this->selfDeleting;
     }
 }

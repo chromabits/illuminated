@@ -1,7 +1,14 @@
 {
   "name": "chromabits/illuminated",
-  "description": "Library of Laravel 5 utilities. (Formerly known as laravel-helpers)",
+  "description": "Collection of Laravel 5 components and utilities.",
   "license": "MIT",
+  "authors": [
+    {
+      "name": "Eduardo Trujillo",
+      "email": "ed@chromabits.com"
+    }
+  ],
+  "minimum-stability": "stable",
   "require": {
     "illuminate/auth": "^5.0",
     "illuminate/support": "^5.0",
@@ -14,12 +21,16 @@
     "league/commonmark": "^0.12",
     "vlucas/phpdotenv": "~2.0"
   },
-  "authors": [
-    {
-      "name": "Eduardo Trujillo",
-      "email": "ed@chromabits.com"
-    }
-  ],
+  "suggests": {
+    "guzzlehttp/guzzle": "~6.1"
+  },
+  "require-dev": {
+    "laravel/framework": "^5.0",
+    "phpunit/phpunit": "~4.6@dev",
+    "mockery/mockery": "0.9.*@dev",
+    "doctrine/dbal": "~2.3",
+    "chromabits/standards": "~0.1.10"
+  },
   "autoload": {
     "psr-4": {
       "Chromabits\\Illuminated\\": "src/Chromabits/Illuminated"
@@ -30,13 +41,5 @@
       "Tests\\Chromabits\\Illuminated\\": "tests/Chromabits/Illuminated",
       "Tests\\Chromabits\\Support\\": "tests/Chromabits/Support"
     }
-  },
-  "minimum-stability": "stable",
-  "require-dev": {
-    "laravel/framework": "^5.0",
-    "phpunit/phpunit": "~4.6@dev",
-    "mockery/mockery": "0.9.*@dev",
-    "doctrine/dbal": "~2.3",
-    "chromabits/standards": "~0.1.10"
   }
 }

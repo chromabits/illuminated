@@ -109,7 +109,7 @@ class ConferencePage implements RenderableInterface, SafeHtmlProducerInterface
         );
 
         $modulesDropdown = Std::foldr(
-            function (NavbarDropdownFactory $factory, Module $module) {
+            function (Module $module, NavbarDropdownFactory $factory) {
                 return $factory->addOption(
                     $this->context->module($module->getName()),
                     $module->getLabel()

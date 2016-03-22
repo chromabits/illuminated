@@ -24,6 +24,7 @@ use Chromabits\Nucleus\View\Bootstrap\Row;
 use Chromabits\Nucleus\View\Common\Anchor;
 use Chromabits\Nucleus\View\Common\Bold;
 use Chromabits\Nucleus\View\Common\Button;
+use Chromabits\Nucleus\View\Common\Code;
 use Chromabits\Nucleus\View\Common\Div;
 use Chromabits\Nucleus\View\Common\HeaderFive;
 use Chromabits\Nucleus\View\Common\HeaderFour;
@@ -151,24 +152,23 @@ class FrontModuleController extends BaseController
                     ['class' => 'card-block'],
                     Std::map(function (Module $module) {
                         return new Div([], [
-                            new HeaderSix([], $module->getName()),
+                            new HeaderFive([], $module->getName()),
                             new Paragraph([], [
                                 new Bold([], 'Class Name: '),
-                                get_class($module),
+                                new Code([], get_class($module)),
                                 new LineBreak([]),
                                 new Bold([], 'Methods: '),
                             ]),
                             new UnorderedList([], Std::map(
                                 function (Method $method) {
-                                    return new ListItem([], [
-                                        $method->getLabel(),
-                                        ' (',
-                                        $method->getName(),
-                                        ') -> ',
-                                        $method->getControllerClassName(),
-                                        '@',
-                                        $method->getControllerMethodName(),
-                                    ]);
+                                    return new ListItem([], vsprintf(
+                                        '%s (%s) -> %s@%s', [
+                                            $method->getLabel(),
+                                            $method->getName(),
+                                            $method->getControllerClassName(),
+                                            $method->getControllerMethodName(),
+                                        ])
+                                    );
                                 },
                                 $module->getMethods()
                             )),

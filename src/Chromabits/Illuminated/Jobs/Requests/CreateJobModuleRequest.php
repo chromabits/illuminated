@@ -106,17 +106,17 @@ class CreateJobModuleRequest extends ConferenceFrontCheckableRequest
             ->withFieldLabel('run_at', 'Run at')
             ->withFieldDefault(
                 'run_at',
-                Carbon::now()->addMinute()->format('d/m/Y H:m:s')
+                Carbon::now()->addMinute()->format('m/d/Y H:m:s')
             )
             ->withFieldConstraints('run_at', [
                 new StringLengthConstraint(0, 255),
                 new DateTimeStringConstraint(),
             ])
             ->withFieldRequired('run_at', true)
-            ->withFieldDescription('run_at', 'Format: dd/mm/yyyy hh:mm:ss.')
+            ->withFieldDescription('run_at', 'Format: mm/dd/yyyy hh:mm:ss.')
             // Expire at
             ->withFieldType('expire_at', Boa::string())
-            ->withFieldDescription('expire_at', 'Format: dd/mm/yyyy hh:mm:ss.')
+            ->withFieldDescription('expire_at', 'Format: mm/dd/yyyy hh:mm:ss.')
             ->withFieldConstraints('expire_at', [
                 new StringLengthConstraint(0, 255),
                 new DateTimeStringConstraint(),

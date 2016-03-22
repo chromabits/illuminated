@@ -106,7 +106,7 @@ class CreateJobModuleRequest extends ConferenceFrontCheckableRequest
             ->withFieldLabel('run_at', 'Run at')
             ->withFieldDefault(
                 'run_at',
-                Carbon::now()->addMinute()->format('m/d/Y H:m:s')
+                Carbon::now()->addMinute()->format('m/d/Y H:i:s')
             )
             ->withFieldConstraints('run_at', [
                 new StringLengthConstraint(0, 255),

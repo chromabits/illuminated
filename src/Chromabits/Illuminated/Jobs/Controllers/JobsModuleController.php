@@ -207,7 +207,13 @@ class JobsModuleController extends BaseController
             );
         }
 
-        $jobScheduler->push($job, Carbon::parse($request->get('run_at')));
+        $runAt = Carbon::parse($request->get('run_at'));
+
+        if ($runAt->lt(Carbon::now())) {
+            $runAt = Carbon::now()->addSeconds(5);
+        }
+
+        $jobScheduler->push($job, $runAt);
 
         return $redirector->to($this->context->method(
             JobsModule::NAME,

@@ -1,4 +1,4 @@
-> *DEPRECATED:* This package is no longer maintained. It has been replaced by https://github.com/sellerlabs/illuminated.
+> **DEPRECATED:** This package is no longer maintained. It has been replaced by https://github.com/sellerlabs/illuminated.
 
 # [illuminated](http://phabricator.chromabits.com/diffusion/LLMNTD/) [![Build Status](https://travis-ci.org/chromabits/illuminated.svg?branch=master)](https://travis-ci.org/chromabits/illuminated) ![](https://img.shields.io/packagist/v/chromabits/illuminated.svg) [![](https://img.shields.io/badge/ApiGen-reference-blue.svg)](http://chromabits.github.io/illuminated)
 

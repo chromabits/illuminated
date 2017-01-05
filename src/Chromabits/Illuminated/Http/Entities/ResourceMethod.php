@@ -39,13 +39,19 @@ class ResourceMethod extends BaseObject
     protected $path;
 
     /**
+     * @var array
+     */
+    protected $where;
+
+    /**
      * Construct an instance of a ResourceMethod.
      *
      * @param string $method
      * @param string $verb
      * @param string $path
+     * @param array $where
      */
-    public function __construct($method, $verb, $path)
+    public function __construct($method, $verb, $path, $where = [])
     {
         parent::__construct();
 
@@ -82,5 +88,13 @@ class ResourceMethod extends BaseObject
     public function getPath()
     {
         return $this->path;
+    }
+
+    /**
+     * @return array
+     */
+    public function getWhere()
+    {
+        return $this->where;
     }
 }

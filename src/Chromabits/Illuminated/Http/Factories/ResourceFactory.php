@@ -112,12 +112,13 @@ class ResourceFactory extends BaseObject
     /**
      * @param string $path
      * @param string $method
+     * @param array $where
      *
      * @return $this
      */
-    public function get($path, $method)
+    public function get($path, $method, $where = [])
     {
-        $this->methods[] = new ResourceMethod($method, HttpMethods::GET, $path);
+        $this->methods[] = new ResourceMethod($method, HttpMethods::GET, $path, $where);
 
         return $this;
     }
@@ -125,15 +126,17 @@ class ResourceFactory extends BaseObject
     /**
      * @param string $path
      * @param string $method
+     * @param array $where
      *
      * @return $this
      */
-    public function post($path, $method)
+    public function post($path, $method, $where = [])
     {
         $this->methods[] = new ResourceMethod(
             $method,
             HttpMethods::POST,
-            $path
+            $path,
+            $where
         );
 
         return $this;
@@ -142,12 +145,13 @@ class ResourceFactory extends BaseObject
     /**
      * @param string $path
      * @param string $method
+     * @param array $where
      *
      * @return $this
      */
-    public function put($path, $method)
+    public function put($path, $method, $where = [])
     {
-        $this->methods[] = new ResourceMethod($method, HttpMethods::PUT, $path);
+        $this->methods[] = new ResourceMethod($method, HttpMethods::PUT, $path, $where);
 
         return $this;
     }
@@ -155,15 +159,17 @@ class ResourceFactory extends BaseObject
     /**
      * @param string $path
      * @param string $method
+     * @param array $where
      *
      * @return $this
      */
-    public function delete($path, $method)
+    public function delete($path, $method, $where = [])
     {
         $this->methods[] = new ResourceMethod(
             $method,
             HttpMethods::DELETE,
-            $path
+            $path,
+            $where
         );
 
         return $this;
@@ -191,7 +197,7 @@ class ResourceFactory extends BaseObject
                     [$method->getVerb()],
                     $method->getPath(),
                     $handler
-                );
+                )->where($method->getWhere());
             }, $this->methods);
         });
 

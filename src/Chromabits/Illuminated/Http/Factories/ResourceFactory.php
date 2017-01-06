@@ -197,7 +197,11 @@ class ResourceFactory extends BaseObject
                     [$method->getVerb()],
                     $method->getPath(),
                     $handler
-                )->where($method->getWhere());
+                );
+                $where = $method->getWhere();
+                if (!empty($where)) {
+                    $r->where($where);
+                }
             }, $this->methods);
         });
 
